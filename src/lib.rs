@@ -3,7 +3,6 @@ extern crate regex;
 extern crate serde_derive;
 extern crate serde_json;
 extern crate serde_xml_rs;
-extern crate toml;
 
 pub mod build;
 pub mod configuration;
@@ -34,10 +33,12 @@ pub fn generate_bindings(config: &Config) -> Result<(), Box<Error>> {
 pub fn generate_bindings_from_config_file<P: AsRef<Path>>(
     config_file: P,
     overwrite_implementation: bool,
+    edition: Option<&str>,
 ) -> Result<(), Box<Error>> {
     let mut config = read_bindings_file(config_file)?;
     if overwrite_implementation {
         config.overwrite_implementation = true;
     }
+    config.rust_edition = edition.into();
     generate_bindings(&config)
 }

@@ -5,7 +5,6 @@ use std::error::Error;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
-use toml;
 
 mod json {
     use super::Rust;
@@ -466,27 +465,12 @@ fn post_process(config_file: &Path, json: json::Config) -> Result<Config, Box<Er
         post_process_object(object, &mut objects, &json.objects)?;
     }
 
-    let rust_edition: RustEdition = {
-        let mut buf = config_file.to_path_buf();
-        buf.pop();
-        buf.push(&json.rust.dir);
-        buf.push("Cargo.toml");
-        if !buf.exists() {
-            return Err(format!("{} does not exist.", buf.display()).into());
-        }
-        let manifest: toml::Value = fs::read_to_string(&buf)?.parse()?;
-        manifest["package"]
-            .get("edition")
-            .and_then(|val| val.as_str())
-            .into()
-    };
-
     Ok(Config {
         config_file: config_file.into(),
         cpp_file: json.cpp_file,
         objects,
         rust: json.rust,
-        rust_edition,
+        rust_edition: RustEdition::Rust2015,
         overwrite_implementation: json.overwrite_implementation,
     })
 }

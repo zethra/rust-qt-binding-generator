@@ -13,6 +13,12 @@ fn main() {
                 .help("Overwrite existing implementation."),
         )
         .arg(
+            Arg::with_name("edition")
+                .long("edition")
+                .takes_value(true)
+                .help("Rust edition (default 2015)")
+        )
+        .arg(
             Arg::with_name("config")
                 .multiple(true)
                 .required(true)
@@ -22,8 +28,9 @@ fn main() {
         .get_matches();
 
     let overwrite_implementation = matches.is_present("overwrite-implementation");
+    let edition = matches.value_of("edition");
     for config in matches.values_of("config").unwrap() {
-        if let Err(e) = generate_bindings_from_config_file(config, overwrite_implementation) {
+        if let Err(e) = generate_bindings_from_config_file(config, overwrite_implementation, edition) {
             eprintln!("{}", e);
             ::std::process::exit(1);
         }
